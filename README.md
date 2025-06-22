@@ -35,6 +35,8 @@ You can test the app using the following credentials:
 Email: teste@teste.com
 Password: 123456
 
+```
+
 ---
 
 🧑‍💻 Author
