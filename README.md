@@ -41,6 +41,6 @@ Password: 123456
 
 🧑‍💻 Author
 
-Developed by Mark Aguiar
-📫 Email: marcoaguiar14@gmail.com
+Developed by Mark Aguiar<br>
+📫 Email: marcoaguiar14@gmail.com<br>
 🌐 GitHub: https://github.com/Marco-Aguiar
