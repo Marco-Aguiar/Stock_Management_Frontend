@@ -1,79 +1,149 @@
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useDarkMode } from "../hooks/useDarkMode"
+import { Sun, Moon, DollarSign, Package, Truck, BarChart, ShoppingCart } from "lucide-react" // Importing icons
+
+type ProdutoMaisVendido = {
+  nome: string
+  quantidade: number
+}
+
+type DashboardData = {
+  totalVendas: number
+  totalLucro: number
+  totalDespesas: number
+  lucroLiquido: number
+  topProdutosMaisVendidos: ProdutoMaisVendido[]
+  viagemMaisRentavel: { viagemId: number; receita: number } | null
+}
 
 export default function Dashboard() {
   const navigate = useNavigate()
   const [isDark, setIsDark] = useDarkMode()
+  const [dados, setDados] = useState<DashboardData | null>(null)
 
-  const saldo = 1247.32 // virá do backend depois
+  useEffect(() => {
+    fetch("http://localhost:3000/dashboard")
+      .then(res => res.json())
+      .then(setDados)
+      .catch(error => console.error("Erro ao carregar dashboard:", error))
+  }, [])
+
+  const saldo = dados ? dados.lucroLiquido : 0
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Painel do Caminhoneiro</h1>
-        <button
-          onClick={() => setIsDark(!isDark)}
-          className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 transition"
-        >
-          Modo {isDark ? "Claro" : "Escuro"}
-        </button>
-      </div>
-
-      <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mb-8">
-        <div
-          className={`p-6 rounded-xl shadow-md ${
-            saldo >= 0
-              ? "bg-green-100 text-green-900 dark:bg-green-800 dark:text-green-100"
-              : "bg-red-100 text-red-900 dark:bg-red-800 dark:text-red-100"
-          }`}
-        >
-          <h2 className="text-lg font-semibold">Saldo Atual</h2>
-          <p className="text-3xl font-bold mt-2">
-            R$ {saldo.toFixed(2).replace(".", ",")}
-          </p>
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-900 flex flex-col items-center justify-center p-4 transition-colors duration-300">
+      <div className="w-full max-w-4xl"> {/* Increased max-width for dashboard content */}
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-4xl font-bold text-indigo-600 dark:text-indigo-400">
+            Painel do Caminhoneiro
+          </h1>
+          <button
+            onClick={() => setIsDark(!isDark)}
+            className="px-4 py-2 rounded-lg text-sm font-medium bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-600 transition-all duration-300 ease-in-out flex items-center gap-2"
+          >
+            {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            Modo {isDark ? "Claro" : "Escuro"}
+          </button>
         </div>
 
-        <div className="p-6 rounded-xl shadow-md bg-white dark:bg-gray-800 dark:text-gray-100">
-          <h2 className="text-lg font-semibold">Produtos mais vendidos</h2>
-          <ul className="mt-2 text-sm space-y-1">
-            <li>🌹 Rosas Vermelhas</li>
-            <li>🌻 Girassóis</li>
-            <li>💐 Buquê Sortido</li>
-          </ul>
-        </div>
-      </div>
+        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mb-8">
+          {/* Card de Saldo Atual */}
+          <div
+            className={`p-6 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center text-center transition-colors duration-300
+            ${
+              saldo >= 0
+                ? "bg-green-50 text-green-800 dark:bg-green-900 dark:text-green-200"
+                : "bg-red-50 text-red-800 dark:bg-red-900 dark:text-red-200"
+            }`}
+          >
+            <DollarSign className="h-10 w-10 mb-3" /> {/* Icon for Saldo */}
+            <h2 className="text-xl font-semibold mb-2">Saldo Atual</h2>
+            <p className="text-4xl font-bold">
+              R$ {saldo.toFixed(2).replace(".", ",")}
+            </p>
+          </div>
 
-      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-        <button
-          onClick={() => navigate("/nova-venda")}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold"
-        >
-          + Nova Venda
-        </button>
-        <button
-          onClick={() => navigate("/cadastrar-produto")}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-semibold"
-        >
-          + Novo Produto
-        </button>
-        <button
-          onClick={() => navigate("/nova-viagem")}
-          className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold"
-        >
-          + Nova Viagem
-        </button>
-        <button
-          onClick={() => navigate("/relatorio-viagens")}
-          className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold"
-        >
-          📍 Relatório de Viagens
-        </button>
-        <button
-          onClick={() => navigate("/relatorio-vendas")}
-          className="bg-pink-600 hover:bg-pink-700 text-white px-6 py-3 rounded-lg font-semibold"
-        >
-          📊 Relatório de Vendas
-        </button>
+          {/* Card de Top Produtos Mais Vendidos */}
+          <div className="p-6 rounded-2xl shadow-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white transition-colors duration-300">
+            <h2 className="text-xl font-semibold flex items-center gap-2 mb-4">
+              <Package className="h-6 w-6" /> Top 5 Produtos Mais Vendidos
+            </h2>
+            <ul className="mt-2 text-base space-y-2">
+              {dados?.topProdutosMaisVendidos && dados.topProdutosMaisVendidos.length > 0 ? (
+                dados.topProdutosMaisVendidos.map((p, i) => (
+                  <li key={i} className="flex justify-between items-center bg-slate-50 dark:bg-slate-700 p-3 rounded-lg border border-slate-200 dark:border-slate-600">
+                    <span className="font-medium text-slate-700 dark:text-slate-200">{i + 1}. {p.nome}</span>
+                    <span className="text-slate-600 dark:text-slate-300">{p.quantidade} unidades</span>
+                  </li>
+                ))
+              ) : (
+                <li className="text-slate-500 dark:text-slate-400 text-center py-4">Nenhum produto registrado ainda.</li>
+              )}
+            </ul>
+          </div>
+
+          {/* Card de Viagem Mais Rentável (newly added based on your data type) */}
+          <div className="p-6 rounded-2xl shadow-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white transition-colors duration-300 flex flex-col justify-between">
+            <h2 className="text-xl font-semibold flex items-center gap-2 mb-4">
+              <Truck className="h-6 w-6" /> Viagem Mais Rentável
+            </h2>
+            {dados?.viagemMaisRentavel ? (
+              <div className="flex flex-col items-center justify-center h-full text-center">
+                <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+                  Viagem #{dados.viagemMaisRentavel.viagemId}
+                </p>
+                <p className="text-3xl font-bold mt-2">
+                  R$ {dados.viagemMaisRentavel.receita.toFixed(2).replace(".", ",")}
+                </p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
+                  (Maior receita individual)
+                </p>
+              </div>
+            ) : (
+              <p className="text-slate-500 dark:text-slate-400 text-center py-4 h-full flex items-center justify-center">Nenhuma viagem registrada com receita ainda.</p>
+            )}
+          </div>
+        </div>
+
+        {/* Action Buttons Section */}
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+          <button
+            onClick={() => navigate("/nova-venda")}
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-4 rounded-lg font-semibold flex items-center justify-center transition-all duration-300 ease-in-out shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+          >
+            <ShoppingCart className="mr-2 h-5 w-5" />
+            + Nova Venda
+          </button>
+          <button
+            onClick={() => navigate("/cadastrar-produto")}
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-4 rounded-lg font-semibold flex items-center justify-center transition-all duration-300 ease-in-out shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+          >
+            <Package className="mr-2 h-5 w-5" />
+            + Novo Produto
+          </button>
+          <button
+            onClick={() => navigate("/nova-viagem")}
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-4 rounded-lg font-semibold flex items-center justify-center transition-all duration-300 ease-in-out shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+          >
+            <Truck className="mr-2 h-5 w-5" />
+            + Nova Viagem
+          </button>
+          <button
+            onClick={() => navigate("/relatorio-viagens")}
+            className="w-full bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white py-3 px-4 rounded-lg font-semibold flex items-center justify-center transition-all duration-300 ease-in-out shadow-md hover:shadow-lg transform hover:-translate-y-0.5 hover:bg-slate-300 dark:hover:bg-slate-600"
+          >
+            <BarChart className="mr-2 h-5 w-5" />
+            Relatório de Viagens
+          </button>
+          <button
+            onClick={() => navigate("/relatorio-vendas")}
+            className="w-full bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white py-3 px-4 rounded-lg font-semibold flex items-center justify-center transition-all duration-300 ease-in-out shadow-md hover:shadow-lg transform hover:-translate-y-0.5 hover:bg-slate-300 dark:hover:bg-slate-600"
+          >
+            <ShoppingCart className="mr-2 h-5 w-5" />
+            Relatório de Vendas
+          </button>
+        </div>
       </div>
     </div>
   )
