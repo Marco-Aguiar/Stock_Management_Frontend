@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useDarkMode } from "../hooks/useDarkMode"
-import { Sun, Moon, DollarSign, Package, Truck, BarChart, ShoppingCart } from "lucide-react" // Importing icons
+// Importando TODOS os ícones necessários, incluindo ClipboardList para o novo relatório
+import { Sun, Moon, DollarSign, Package, Truck, BarChart, ShoppingCart, Warehouse, PackagePlus, ClipboardList } from "lucide-react"
+import { useAuth } from "../contexts/AuthContext"
 
 type ProdutoMaisVendido = {
   nome: string
@@ -21,8 +23,10 @@ export default function Dashboard() {
   const navigate = useNavigate()
   const [isDark, setIsDark] = useDarkMode()
   const [dados, setDados] = useState<DashboardData | null>(null)
+  const { nomeUsuario } = useAuth() // <-- NOVO: Acesse o nomeUsuario do contexto de autenticação
 
   useEffect(() => {
+    // Certifique-se de que se precisar de autenticação para essa chamada, o token seja enviado
     fetch("http://localhost:3000/dashboard")
       .then(res => res.json())
       .then(setDados)
@@ -33,10 +37,11 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-900 flex flex-col items-center justify-center p-4 transition-colors duration-300">
-      <div className="w-full max-w-4xl"> {/* Increased max-width for dashboard content */}
+      <div className="w-full max-w-4xl">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl font-bold text-indigo-600 dark:text-indigo-400">
-            Painel do Caminhoneiro
+            {/* <-- NOVO: Adicione a saudação com o nome do usuário */}
+            Olá {nomeUsuario ? nomeUsuario.split(' ')[0] : 'Caminhoneiro'}!
           </h1>
           <button
             onClick={() => setIsDark(!isDark)}
@@ -47,6 +52,7 @@ export default function Dashboard() {
           </button>
         </div>
 
+        {/* --- Dashboard Cards (unchanged) --- */}
         <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mb-8">
           {/* Card de Saldo Atual */}
           <div
@@ -57,7 +63,7 @@ export default function Dashboard() {
                 : "bg-red-50 text-red-800 dark:bg-red-900 dark:text-red-200"
             }`}
           >
-            <DollarSign className="h-10 w-10 mb-3" /> {/* Icon for Saldo */}
+            <DollarSign className="h-10 w-10 mb-3" />
             <h2 className="text-xl font-semibold mb-2">Saldo Atual</h2>
             <p className="text-4xl font-bold">
               R$ {saldo.toFixed(2).replace(".", ",")}
@@ -83,7 +89,7 @@ export default function Dashboard() {
             </ul>
           </div>
 
-          {/* Card de Viagem Mais Rentável (newly added based on your data type) */}
+          {/* Card de Viagem Mais Rentável */}
           <div className="p-6 rounded-2xl shadow-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white transition-colors duration-300 flex flex-col justify-between">
             <h2 className="text-xl font-semibold flex items-center gap-2 mb-4">
               <Truck className="h-6 w-6" /> Viagem Mais Rentável
@@ -106,15 +112,9 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Action Buttons Section */}
+        {/* --- Action Buttons Section (REORDENADA) --- */}
         <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-          <button
-            onClick={() => navigate("/nova-venda")}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-4 rounded-lg font-semibold flex items-center justify-center transition-all duration-300 ease-in-out shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-          >
-            <ShoppingCart className="mr-2 h-5 w-5" />
-            + Nova Venda
-          </button>
+          {/* 1. Cadastro de Produtos */}
           <button
             onClick={() => navigate("/cadastrar-produto")}
             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-4 rounded-lg font-semibold flex items-center justify-center transition-all duration-300 ease-in-out shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
@@ -122,12 +122,46 @@ export default function Dashboard() {
             <Package className="mr-2 h-5 w-5" />
             + Novo Produto
           </button>
+          {/* 2. Nova Viagem */}
           <button
             onClick={() => navigate("/nova-viagem")}
             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-4 rounded-lg font-semibold flex items-center justify-center transition-all duration-300 ease-in-out shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
           >
             <Truck className="mr-2 h-5 w-5" />
             + Nova Viagem
+          </button>
+          {/* 3. Nova Venda */}
+          <button
+            onClick={() => navigate("/nova-venda")}
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-4 rounded-lg font-semibold flex items-center justify-center transition-all duration-300 ease-in-out shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+          >
+            <ShoppingCart className="mr-2 h-5 w-5" />
+            + Nova Venda
+          </button>
+
+          {/* Gerenciamento de Estoque */}
+          <button
+            onClick={() => navigate("/estoque-atual")}
+            className="w-full bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white py-3 px-4 rounded-lg font-semibold flex items-center justify-center transition-all duration-300 ease-in-out shadow-md hover:shadow-lg transform hover:-translate-y-0.5 hover:bg-slate-300 dark:hover:bg-slate-600"
+          >
+            <Warehouse className="mr-2 h-5 w-5" />
+            Estoque Atual
+          </button>
+          <button
+            onClick={() => navigate("/entrada-produtos")}
+            className="w-full bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white py-3 px-4 rounded-lg font-semibold flex items-center justify-center transition-all duration-300 ease-in-out shadow-md hover:shadow-lg transform hover:-translate-y-0.5 hover:bg-slate-300 dark:hover:bg-slate-600"
+          >
+            <PackagePlus className="mr-2 h-5 w-5" />
+            Entrada de Produtos
+          </button>
+
+          {/* Relatórios */}
+          <button
+            onClick={() => navigate("/relatorio-inventario")}
+            className="w-full bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white py-3 px-4 rounded-lg font-semibold flex items-center justify-center transition-all duration-300 ease-in-out shadow-md hover:shadow-lg transform hover:-translate-y-0.5 hover:bg-slate-300 dark:hover:bg-slate-600"
+          >
+            <ClipboardList className="mr-2 h-5 w-5" />
+            Relatório de Inventário
           </button>
           <button
             onClick={() => navigate("/relatorio-viagens")}

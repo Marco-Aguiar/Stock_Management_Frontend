@@ -1,11 +1,13 @@
+// src/pages/Login.tsx
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../contexts/AuthContext"; // Importação do useAuth
 import { AtSign, Lock, Eye, EyeOff, LogIn } from "lucide-react";
 
 export default function Login() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login } = useAuth(); // Usando o hook useAuth para obter a função login
 
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -30,9 +32,19 @@ export default function Login() {
         throw new Error(err.message || "E-mail ou senha inválidos.");
       }
 
-      const { token } = await res.json();
-      localStorage.setItem("token", token);
-      login(token);
+      // <-- ATENÇÃO AQUI: Agora desestruturamos 'token' E 'nomeUsuario' da resposta
+      const { token, nomeUsuario } = await res.json();
+
+      // Você já está salvando o token no localStorage via useAuth().login
+      // Então, esta linha `localStorage.setItem("token", token);` pode ser removida
+      // se a função `login` do AuthContext já faz isso.
+      // Vou manter a chamada `login(token, nomeUsuario)` abaixo, que é a que realmente
+      // gerencia o estado e o localStorage pelo AuthContext.
+      // localStorage.setItem("token", token); // <-- Esta linha provavelmente será removida/comentada
+
+      // <-- ATENÇÃO AQUI: Passamos AMBOS o token e o nomeUsuario para a função login
+      login(token, nomeUsuario); // Corrigido para passar o nome do usuário
+
       navigate("/dashboard");
     } catch (err: any) {
       setErro(err.message);
@@ -61,12 +73,10 @@ export default function Login() {
             Acesso ao Sistema
           </h2>
 
-          {/* --- CAMPO DE E-MAIL CORRIGIDO --- */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">
               E-mail
             </label>
-            {/* O 'relative' agora está neste container que envolve apenas o input e o ícone */}
             <div className="relative">
               <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
               <input
@@ -80,12 +90,10 @@ export default function Login() {
             </div>
           </div>
 
-          {/* --- CAMPO DE SENHA CORRIGIDO --- */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">
               Senha
             </label>
-            {/* O 'relative' também foi movido para cá */}
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
               <input
@@ -105,7 +113,7 @@ export default function Login() {
               </button>
             </div>
           </div>
-          
+
           {erro && (
             <p className="text-red-500 dark:text-red-400 text-sm text-center bg-red-100 dark:bg-red-900/20 p-3 rounded-lg mb-4">
               {erro}
