@@ -1,8 +1,13 @@
+// src/pages/CadastroProduto.tsx
+
 import { useState } from "react"
-import { PackagePlus, Save } from "lucide-react" // Importando ícones para consistência
+import { PackagePlus, Save, ArrowLeft } from "lucide-react" // Importando ícones e ArrowLeft
 import StatusModal from "../modal/statusModal"
+import { useNavigate } from "react-router-dom" // Importando useNavigate para navegação
 
 export default function CadastroProduto() {
+  const navigate = useNavigate(); // Hook para navegação
+
   const [nome, setNome] = useState("")
   const [categoria, setCategoria] = useState("")
   const [precoCompra, setPrecoCompra] = useState(0)
@@ -64,91 +69,112 @@ export default function CadastroProduto() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-900 flex flex-col items-center justify-center p-4 transition-colors duration-300">
-      <form
-        onSubmit={salvarProduto}
-        className="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 w-full max-w-xl text-slate-800 dark:text-white"
-      >
-        <h2 className="text-2xl font-semibold text-center text-slate-800 dark:text-white mb-6 flex items-center justify-center gap-2">
-          <PackagePlus className="h-7 w-7" /> Novo Produto
-        </h2>
-
-        <label htmlFor="nome-produto" className="block mb-2 text-sm font-medium text-slate-600 dark:text-slate-300">Nome</label>
-        <input
-          id="nome-produto"
-          type="text"
-          value={nome}
-          onChange={(e) => setNome(e.target.value)}
-          className="w-full mb-4 border border-slate-300 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition px-4 py-2"
-          required
-        />
-
-        <label htmlFor="categoria-produto" className="block mb-2 text-sm font-medium text-slate-600 dark:text-slate-300">Categoria</label>
-        <input
-          id="categoria-produto"
-          type="text"
-          value={categoria}
-          onChange={(e) => setCategoria(e.target.value)}
-          className="w-full mb-4 border border-slate-300 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition px-4 py-2"
-        />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="preco-compra" className="block mb-2 text-sm font-medium text-slate-600 dark:text-slate-300">
-              Preço de compra
-            </label>
-            <input
-              id="preco-compra"
-              type="number"
-              step="0.01"
-              value={precoCompra}
-              onChange={(e) => setPrecoCompra(Number(e.target.value))}
-              className="w-full mb-4 border border-slate-300 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition px-4 py-2"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="margem-lucro" className="block mb-2 text-sm font-medium text-slate-600 dark:text-slate-300">
-              Margem de lucro (%)
-            </label>
-            <input
-              id="margem-lucro"
-              type="number"
-              step="1"
-              value={margemLucro}
-              onChange={(e) => setMargemLucro(Number(e.target.value))}
-              className="w-full mb-4 border border-slate-300 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition px-4 py-2"
-              required
-            />
-          </div>
-        </div>
-
-        <div className="mb-4 text-sm text-slate-700 dark:text-slate-200">
-          Preço de venda calculado:{" "}
-          <span className="font-semibold text-green-600 dark:text-green-400">
-            R$ {precoVenda.toFixed(2).replace(".", ",")}
-          </span>
-        </div>
-
-        <label htmlFor="quantidade-produto" className="block mb-2 text-sm font-medium text-slate-600 dark:text-slate-300">Quantidade</label>
-        <input
-          id="quantidade-produto"
-          type="number"
-          min="1"
-          value={quantidade}
-          onChange={(e) => setQuantidade(Number(e.target.value))}
-          className="w-full mb-6 border border-slate-300 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition px-4 py-2"
-          required
-        />
-
+    // Novo gradiente de fundo e estrutura para o botão de voltar
+    <div className="min-h-screen bg-gradient-to-b from-blue-800 via-purple-800 to-indigo-900 dark:from-gray-900 dark:via-slate-900 dark:to-black flex flex-col items-center p-4 transition-colors duration-500 ease-in-out">
+      <div className="w-full max-w-xl relative"> {/* Container para alinhar o botão e o formulário */}
+        {/* Botão de Voltar para Dashboard */}
         <button
-          type="submit"
-          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-4 rounded-lg font-semibold flex items-center justify-center transition-all duration-300 ease-in-out shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+          onClick={() => navigate("/dashboard")}
+          className="absolute top-0 -left-12 sm:-left-20 lg:-left-28 p-3 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white shadow-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-all duration-300 transform hover:-translate-x-1 flex items-center justify-center z-10"
+          aria-label="Voltar para o Dashboard"
         >
-          <Save className="mr-2 h-5 w-5" />
-          Salvar produto
+          <ArrowLeft className="h-6 w-6" />
         </button>
-      </form>
+
+        <form
+          onSubmit={salvarProduto}
+          className="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 w-full text-slate-800 dark:text-white relative" // Adicionado relative para posicionamento interno
+        >
+          <h2 className="text-3xl font-bold text-center text-indigo-600 dark:text-indigo-400 mb-8 flex items-center justify-center gap-3">
+            <PackagePlus className="h-8 w-8" /> Cadastrar Novo Produto
+          </h2>
+
+          <div className="mb-4">
+            <label htmlFor="nome-produto" className="block mb-2 text-md font-medium text-slate-700 dark:text-slate-300">Nome do Produto</label>
+            <input
+              id="nome-produto"
+              type="text"
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+              placeholder="Ex: Óleo 20W50"
+              required
+            />
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="categoria-produto" className="block mb-2 text-md font-medium text-slate-700 dark:text-slate-300">Categoria</label>
+            <input
+              id="categoria-produto"
+              type="text"
+              value={categoria}
+              onChange={(e) => setCategoria(e.target.value)}
+              className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+              placeholder="Ex: Lubrificantes"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label htmlFor="preco-compra" className="block mb-2 text-md font-medium text-slate-700 dark:text-slate-300">
+                Preço de Compra (R$)
+              </label>
+              <input
+                id="preco-compra"
+                type="number"
+                step="0.01"
+                value={precoCompra}
+                onChange={(e) => setPrecoCompra(Number(e.target.value))}
+                className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="margem-lucro" className="block mb-2 text-md font-medium text-slate-700 dark:text-slate-300">
+                Margem de Lucro (%)
+              </label>
+              <input
+                id="margem-lucro"
+                type="number"
+                step="1"
+                min="0"
+                value={margemLucro}
+                onChange={(e) => setMargemLucro(Number(e.target.value))}
+                className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="mb-6 text-lg text-slate-700 dark:text-slate-200 text-center p-3 rounded-lg bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600">
+            Preço de Venda Calculado:{" "}
+            <span className="font-extrabold text-green-600 dark:text-green-400">
+              R$ {precoVenda.toFixed(2).replace(".", ",")}
+            </span>
+          </div>
+
+          <div className="mb-6">
+            <label htmlFor="quantidade-produto" className="block mb-2 text-md font-medium text-slate-700 dark:text-slate-300">Quantidade em Estoque</label>
+            <input
+              id="quantidade-produto"
+              type="number"
+              min="0" 
+              value={quantidade}
+              onChange={(e) => setQuantidade(Number(e.target.value))}
+              className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-4 rounded-lg font-semibold flex items-center justify-center transition-all duration-300 ease-in-out shadow-md hover:shadow-xl transform hover:-translate-y-1 text-lg"
+          >
+            <Save className="mr-3 h-6 w-6" />
+            Salvar Produto
+          </button>
+        </form>
+      </div>
 
       {/* Renderiza o modal de status condicionalmente */}
       {showStatusModal && (
@@ -156,6 +182,7 @@ export default function CadastroProduto() {
           message={statusMessage}
           type={statusType}
           onClose={() => setShowStatusModal(false)}
+          duration={2000} // Passa a duração de 2 segundos (2000 ms)
         />
       )}
     </div>

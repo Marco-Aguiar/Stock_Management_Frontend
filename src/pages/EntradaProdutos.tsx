@@ -1,6 +1,9 @@
+// src/pages/EntradaProdutos.tsx
+
 import { useEffect, useState } from "react";
-import { PackagePlus, Save, Box, PlusCircle } from "lucide-react"; // Ícones relevantes
+import { PackagePlus, Save, Box, PlusCircle, ArrowLeft } from "lucide-react"; // Ícones relevantes e ArrowLeft
 import StatusModal from "../modal/statusModal";
+import { useNavigate } from "react-router-dom"; // Importando useNavigate para navegação
 
 type Produto = {
   id: number;
@@ -10,6 +13,8 @@ type Produto = {
 };
 
 export default function EntradaProdutos() {
+  const navigate = useNavigate(); // Hook para navegação
+
   const [produtosDisponiveis, setProdutosDisponiveis] = useState<Produto[]>([]);
   const [produtoIdSelecionado, setProdutoIdSelecionado] = useState("");
   const [quantidadeEntrada, setQuantidadeEntrada] = useState(1);
@@ -102,65 +107,88 @@ export default function EntradaProdutos() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-900 flex flex-col items-center justify-center p-4 transition-colors duration-300">
-      <form
-        onSubmit={darEntradaProduto}
-        className="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 w-full max-w-xl text-slate-800 dark:text-white"
-      >
-        <h2 className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 text-center mb-8 flex items-center justify-center gap-3">
-          <PackagePlus className="h-9 w-9" /> Entrada de Produtos
-        </h2>
-
-        {loadingProdutos ? (
-          <p className="text-slate-600 dark:text-slate-300 text-center text-lg mb-6">Carregando produtos disponíveis...</p>
-        ) : (
-          <>
-            <label htmlFor="select-produto-entrada" className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">Produto</label>
-            <div className="relative mb-4">
-              <select
-                id="select-produto-entrada"
-                value={produtoIdSelecionado}
-                onChange={(e) => setProdutoIdSelecionado(e.target.value)}
-                className="block appearance-none w-full border border-slate-300 dark:border-slate-600 rounded-lg pl-4 pr-10 py-2 bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition cursor-pointer"
-                required
-              >
-                <option value="">Selecione um produto</option>
-                {produtosDisponiveis.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.nome} (Estoque atual: {p.quantidade})
-                  </option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-700 dark:text-slate-300">
-                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 6.757 7.586 5.343 9z"/></svg>
-              </div>
-            </div>
-
-            <label htmlFor="input-quantidade-entrada" className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">Quantidade para Entrada</label>
-            <div className="relative mb-6">
-                <input
-                id="input-quantidade-entrada"
-                type="number"
-                min="1"
-                value={quantidadeEntrada}
-                onChange={(e) => setQuantidadeEntrada(Number(e.target.value))}
-                className="w-full border border-slate-300 dark:border-slate-600 rounded-lg pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                required
-                />
-                <Box className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={18} />
-            </div>
-          </>
-        )}
-
+    // Novo gradiente de fundo e estrutura para o botão de voltar
+    <div className="min-h-screen bg-gradient-to-b from-blue-800 via-purple-800 to-indigo-900 dark:from-gray-900 dark:via-slate-900 dark:to-black flex flex-col items-center p-4 transition-colors duration-500 ease-in-out">
+      <div className="w-full max-w-xl relative"> {/* Container para alinhar o botão e o formulário */}
+        {/* Botão de Voltar para Dashboard */}
         <button
-          type="submit"
-          disabled={loadingProdutos || !produtoIdSelecionado || quantidadeEntrada <= 0} // Desabilita se estiver carregando ou campos inválidos
-          className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-400 disabled:cursor-not-allowed text-white py-3 px-4 rounded-lg font-semibold flex items-center justify-center transition-all duration-300 ease-in-out shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+          onClick={() => navigate("/dashboard")}
+          className="absolute top-0 -left-12 sm:-left-20 lg:-left-28 p-3 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white shadow-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-all duration-300 transform hover:-translate-x-1 flex items-center justify-center z-10"
+          aria-label="Voltar para o Dashboard"
         >
-          <Save className="mr-2 h-5 w-5" />
-          Registrar Entrada
+          <ArrowLeft className="h-6 w-6" />
         </button>
-      </form>
+
+        <form
+          onSubmit={darEntradaProduto}
+          className="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 w-full text-slate-800 dark:text-white relative"
+        >
+          <h2 className="text-3xl font-bold text-center text-indigo-600 dark:text-indigo-400 mb-8 flex items-center justify-center gap-3">
+            <PackagePlus className="h-8 w-8" /> Registrar Entrada de Produtos
+          </h2>
+
+          {loadingProdutos ? (
+            <p className="text-slate-600 dark:text-slate-300 text-center text-lg mb-6 py-4">
+              Carregando produtos disponíveis...
+              <span className="animate-pulse block mt-2 text-indigo-500">Aguarde.</span>
+            </p>
+          ) : (
+            <>
+              <div className="mb-4">
+                <label htmlFor="select-produto-entrada" className="block text-md font-medium text-slate-700 dark:text-slate-300 mb-2">Produto</label>
+                <div className="relative">
+                  <select
+                    id="select-produto-entrada"
+                    value={produtoIdSelecionado}
+                    onChange={(e) => setProdutoIdSelecionado(e.target.value)}
+                    className="block appearance-none w-full border border-slate-300 dark:border-slate-600 rounded-lg pl-4 pr-10 py-2 bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 cursor-pointer"
+                    required
+                  >
+                    <option value="">Selecione um produto</option>
+                    {produtosDisponiveis.length > 0 ? (
+                      produtosDisponiveis.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.nome} (Estoque atual: {p.quantidade})
+                        </option>
+                      ))
+                    ) : (
+                      <option value="" disabled>Nenhum produto cadastrado. Cadastre um primeiro!</option>
+                    )}
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-700 dark:text-slate-300">
+                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 6.757 7.586 5.343 9z"/></svg>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <label htmlFor="input-quantidade-entrada" className="block text-md font-medium text-slate-700 dark:text-slate-300 mb-2">Quantidade para Entrada</label>
+                <div className="relative">
+                    <input
+                    id="input-quantidade-entrada"
+                    type="number"
+                    min="1"
+                    value={quantidadeEntrada}
+                    onChange={(e) => setQuantidadeEntrada(Number(e.target.value))}
+                    className="w-full border border-slate-300 dark:border-slate-600 rounded-lg pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                    required
+                    />
+                    <Box className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={20} />
+                </div>
+              </div>
+            </>
+          )}
+
+          <button
+            type="submit"
+            disabled={loadingProdutos || !produtoIdSelecionado || quantidadeEntrada <= 0} // Desabilita se estiver carregando ou campos inválidos
+            className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-400 disabled:cursor-not-allowed text-white py-3 px-4 rounded-lg font-semibold flex items-center justify-center transition-all duration-300 ease-in-out shadow-md hover:shadow-xl transform hover:-translate-y-1 text-lg"
+          >
+            <Save className="mr-3 h-6 w-6" />
+            Registrar Entrada
+          </button>
+        </form>
+      </div>
 
       {/* Renderiza o modal de status condicionalmente */}
       {showStatusModal && (
@@ -168,6 +196,7 @@ export default function EntradaProdutos() {
           message={statusMessage}
           type={statusType}
           onClose={() => setShowStatusModal(false)}
+          duration={2000} // Passa a duração de 2 segundos (2000 ms)
         />
       )}
     </div>
